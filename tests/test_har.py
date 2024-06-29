@@ -1,11 +1,13 @@
 import datetime
 import io
 import json
+import sys
 
-import harfile
 import jsonschema
 from hypothesis import HealthCheck, Phase, given, settings
 from hypothesis import strategies as st
+
+import harfile
 
 # Derived from http://www.softwareishard.com/har/viewer/
 DATETIME_PATTERN = r"^(\d{4})(-)?(\d\d)(-)?(\d\d)(T)?(\d\d)(:)?(\d\d)(:)?(\d\d)(\.\d+)?(Z|([+-])(\d\d)(:)?(\d\d))"
@@ -145,9 +147,7 @@ HAR_SCHEMA = {
                                                         "name": {"type": "string"},
                                                         "value": {"type": "string"},
                                                         "fileName": {"type": "string"},
-                                                        "contentType": {
-                                                            "type": "string"
-                                                        },
+                                                        "contentType": {"type": "string"},
                                                         "comment": {"type": "string"},
                                                     },
                                                     "required": ["name"],
@@ -267,11 +267,127 @@ HAR_SCHEMA = {
 }
 HAR_VALIDATOR = jsonschema.Draft7Validator(HAR_SCHEMA)
 
+
+if sys.version_info < (3, 10):
+    st.register_type_strategy(
+        harfile.Request,
+        st.builds(
+            harfile.Request,
+            bodySize=st.integers(),
+            comment=st.text() | st.none(),
+            cookies=st.lists(
+                st.builds(
+                    harfile.Cookie,
+                    comment=st.text() | st.none(),
+                    domain=st.text() | st.none(),
+                    expires=st.text() | st.none(),
+                    httpOnly=st.booleans() | st.none(),
+                    name=st.text(),
+                    path=st.text() | st.none(),
+                    secure=st.booleans() | st.none(),
+                    value=st.text(),
+                )
+            ),
+            headers=st.lists(
+                st.builds(
+                    harfile.Record,
+                    comment=st.text() | st.none(),
+                    name=st.text(),
+                    value=st.text(),
+                )
+            ),
+            headersSize=st.integers(),
+            httpVersion=st.text(),
+            method=st.text(),
+            postData=st.builds(
+                harfile.PostData,
+                comment=st.text() | st.none(),
+                mimeType=st.text(),
+                params=st.lists(
+                    st.builds(
+                        harfile.PostParameter,
+                        comment=st.text() | st.none(),
+                        contentType=st.text() | st.none(),
+                        fileName=st.text() | st.none(),
+                        name=st.text(),
+                        value=st.text() | st.none(),
+                    )
+                ),
+            ),
+            queryString=st.lists(
+                st.builds(
+                    harfile.Record,
+                    comment=st.text() | st.none(),
+                    name=st.text(),
+                    value=st.text(),
+                )
+            ),
+            url=st.text(),
+        ),
+    )
+    st.register_type_strategy(
+        harfile.Response,
+        st.builds(
+            harfile.Response,
+            bodySize=st.integers(),
+            comment=st.text() | st.none(),
+            content=st.builds(
+                harfile.Content,
+                comment=st.text() | st.none(),
+                compression=st.floats(allow_nan=False, allow_infinity=False) | st.integers(),
+                encoding=st.text() | st.none(),
+                mimeType=st.text() | st.none(),
+                size=st.integers(),
+                text=st.text() | st.none(),
+            ),
+            cookies=st.lists(
+                st.builds(
+                    harfile.Cookie,
+                    comment=st.text() | st.none(),
+                    domain=st.text() | st.none(),
+                    expires=st.text() | st.none(),
+                    httpOnly=st.booleans() | st.none(),
+                    name=st.text(),
+                    path=st.text() | st.none(),
+                    secure=st.booleans() | st.none(),
+                    value=st.text(),
+                )
+            ),
+            headers=st.lists(
+                st.builds(
+                    harfile.Record,
+                    comment=st.text() | st.none(),
+                    name=st.text(),
+                    value=st.text(),
+                )
+            ),
+            headersSize=st.integers(),
+            httpVersion=st.text(),
+            redirectURL=st.text(),
+            status=st.integers(),
+            statusText=st.text(),
+        ),
+    )
+    st.register_type_strategy(
+        harfile.Timings,
+        st.builds(
+            harfile.Timings,
+            blocked=st.floats() | st.integers(),
+            comment=st.text() | st.none(),
+            connect=st.floats() | st.integers(),
+            dns=st.floats() | st.integers(),
+            receive=st.floats() | st.integers(),
+            send=st.floats() | st.integers(),
+            ssl=st.floats() | st.integers(),
+            wait=st.floats() | st.integers(),
+        ),
+    )
+
+
 ENTRY_STRATEGY = st.fixed_dictionaries(
     {
         "startedDateTime": st.datetimes(timezones=st.just(datetime.timezone.utc)),
-        "time": st.floats(min_value=0, allow_nan=False, allow_infinity=False)
-        | st.integers(min_value=0),
+        "time": st.floats(min_value=0, allow_nan=False, allow_infinity=False) | st.integers(min_value=0),
         "request": st.from_type(harfile.Request),
         "response": st.from_type(harfile.Response),
         "timings": st.from_type(harfile.Timings),
@@ -294,7 +410,7 @@ def write_har(arg, entries):
 @given(entries=st.lists(ENTRY_STRATEGY, max_size=10))
 @settings(
     phases=[Phase.reuse, Phase.generate, Phase.shrink],
-    suppress_health_check=[HealthCheck.function_scoped_fixture],
+    suppress_health_check=[HealthCheck.function_scoped_fixture, HealthCheck.too_slow],
 )
 def test_write_har(entries, tmp_path):
     buffer = io.StringIO()
@@ -302,6 +418,9 @@ def test_write_har(entries, tmp_path):
     har = buffer.getvalue()
     HAR_VALIDATOR.validate(json.loads(har))
     path = tmp_path / "test.har"
+    write_har(path, entries)
+    with open(path) as fd:
+        HAR_VALIDATOR.validate(json.load(fd))
     write_har(path, entries)
     with open(path) as fd:
         HAR_VALIDATOR.validate(json.load(fd))
