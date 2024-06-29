@@ -1,7 +1,7 @@
 # harfile
 
 [![CI](https://github.com/schemathesis/harfile/actions/workflows/ci.yml/badge.svg)](https://github.com/schemathesis/harfile/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/Stranger6667/hypothesis-openapi/branch/main/graph/badge.svg)](https://codecov.io/gh/schemathesis/harfile/branch/main)
+[![Coverage](https://codecov.io/gh/schemathesis/harfile/branch/main/graph/badge.svg)](https://codecov.io/gh/schemathesis/harfile/branch/main)
 [![Version](https://img.shields.io/pypi/v/harfile.svg)](https://pypi.org/project/harfile/)
 [![Python versions](https://img.shields.io/pypi/pyversions/harfile.svg)](https://pypi.org/project/harfile/)
 [![License](https://img.shields.io/pypi/l/harfile.svg)](https://opensource.org/licenses/MIT)
