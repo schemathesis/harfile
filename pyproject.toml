@@ -1,0 +1,113 @@
+[project]
+name = "harfile"
+version = "0.1.0"
+description = "Writer for HTTP Archive (HAR) files"
+keywords = ["har", "http", "testing"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Software Development :: Testing",
+]
+authors = [{ name = "Dmitry Dygalo", email = "dmitry@dygalo.dev" }]
+maintainers = [{ name = "Dmitry Dygalo", email = "dmitry@dygalo.dev" }]
+readme = "README.md"
+license = "MIT"
+include = ["src/harfile/py.typed"]
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+tests = [
+    "coverage>=7",
+    "hypothesis>=6",
+    "hypothesis-jsonschema>=0.23.1",
+    "jsonschema>=4.18.0",
+    "pytest>=6.2.0,<8",
+]
+cov = [
+    "coverage-enable-subprocess",
+    "coverage[toml]>=7",
+]
+bench = [
+    "pytest-codspeed==2.2.1",
+]
+dev = ["harfile[tests,cov,bench]"]
+
+[project.urls]
+Changelog = "https://github.com/schemathesis/harfile/blob/main/CHANGELOG.md"
+"Bug Tracker" = "https://github.com/schemathesis/harfile"
+Funding = "https://github.com/sponsors/Stranger6667"
+"Source Code" = "https://github.com/schemathesis/harfile"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src",
+  "/tests",
+]
+
+[tool.coverage.run]
+parallel = true
+branch = true
+source_pkgs = ["harfile"]
+
+[tool.coverage.paths]
+source = ["src", ".tox/*/site-packages"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+precision = 2
+exclude_lines = [
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "pass"
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+    "D",  # pydocstyle
+]
+ignore = [
+    "E501",  # Line too long
+    "B008",  # Do not perform function calls in argument defaults
+    "C901",  # Too complex
+    "D100",  # Missing docstring in public module
+    "D101",  # Missing docstring in public class
+    "D102",  # Missing docstring in public method
+    "D103",  # Missing docstring in public function
+    "D104",  # Missing docstring in public package
+    "D105",  # Missing docstring in magic method
+    "D107",  # Missing docstring in `__init__`
+    "D203",  # One blank line before class
+    "D213",  # Multiline summary second line
+    "D401",  # Imperative mood
+]
+
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+
+[tool.ruff.lint.isort]
+known-first-party = ["harfile"]
+known-third-party = ["hypothesis", "hypothesis-jsonschema", "pytest"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
