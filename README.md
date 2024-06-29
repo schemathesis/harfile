@@ -25,17 +25,17 @@ import harfile
 # Write to a file
 with harfile.open("filename.har") as har:
     har.add_entry(
-        started_date_time=datetime.datetime.now(),
+        startedDateTime=datetime.datetime.now(datetime.timezone.utc),
         time=42,
         request=harfile.Request(
             method="GET",
             url="http://example.com",
-            http_version="HTTP/1.1",
+            httpVersion="HTTP/1.1",
         ),
         response=harfile.Response(
             status=200,
             status_text="OK",
-            http_version="HTTP/1.1",
+            httpVersion="HTTP/1.1",
         ),
     )
 
