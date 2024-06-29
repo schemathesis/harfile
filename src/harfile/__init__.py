@@ -149,7 +149,7 @@ class HarFile:
         connection: str | None = None,
         comment: str | None = None,
     ) -> None:
-        separator = "" if self._is_first_entry else ",\n"
+        separator = "\n" if self._is_first_entry else ",\n"
         self._is_first_entry = False
         self._fd.write(f"{separator}            {{")
         self._fd.write(f'\n                "startedDateTime": "{startedDateTime.isoformat()}",')
@@ -170,18 +170,16 @@ class HarFile:
     def _write_preamble(self) -> None:
         creator = f"""{{
             "name": "{self._creator.name}",
-            "version": "{self._creator.version}"
-        """
+            "version": "{self._creator.version}\""""
         if self._creator.comment:
-            creator += f',\n    "comment": "{self._creator.comment}"\n}}'
-        creator += "}"
+            creator += f',\n            "comment": "{self._creator.comment}"'
+        creator += "\n        }"
         browser = f"""{{
             "name": "{self._browser.name}",
-            "version": "{self._browser.version}"
-        """
+            "version": "{self._browser.version}\""""
         if self._browser.comment:
-            browser += f',\n    "comment": "{self._browser.comment}"\n}}'
-        browser += "}"
+            browser += f',\n            "comment": "{self._browser.comment}"'
+        browser += "\n        }"
         self._fd.write(f"""{{
     "log": {{
         "version": "{HAR_VERSION}",
@@ -189,7 +187,7 @@ class HarFile:
         "browser": {browser}""")
         if self._comment:
             self._fd.write(f'    "comment": "{self._comment}"')
-        self._fd.write(',\n        "entries": [\n')
+        self._fd.write(',\n        "entries": [')
 
     def _write_postscript(self) -> None:
         if self._is_first_entry:

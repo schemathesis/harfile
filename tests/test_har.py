@@ -4,6 +4,7 @@ import json
 import sys
 
 import jsonschema
+import pytest
 from hypothesis import HealthCheck, Phase, given, settings
 from hypothesis import strategies as st
 
@@ -424,3 +425,46 @@ def test_write_har(entries, tmp_path):
     write_har(path, entries)
     with open(path) as fd:
         HAR_VALIDATOR.validate(json.load(fd))
+
+
+def test_close():
+    buffer = io.StringIO()
+    with harfile.open(buffer) as har:
+        har.close()
+
+
+def test_exception():
+    buffer = io.StringIO()
+    with pytest.raises(ZeroDivisionError):
+        with harfile.open(buffer):
+            raise ZeroDivisionError
+    assert buffer.getvalue() == ""
+
+
+def test_with_comments():
+    buffer = io.StringIO()
+    with harfile.open(
+        buffer,
+        creator=harfile.Creator(name="test", version="0.1", comment="EXAMPLE-1"),
+        browser=harfile.Browser(name="test", version="0.2", comment="EXAMPLE-2"),
+    ):
+        pass
+    assert (
+        buffer.getvalue()
+        == """{
+    "log": {
+        "version": "1.2",
+        "creator": {
+            "name": "test",
+            "version": "0.1",
+            "comment": "EXAMPLE-1"
+        },
+        "browser": {
+            "name": "test",
+            "version": "0.2",
+            "comment": "EXAMPLE-2"
+        },
+        "entries": []
+    }
+}"""
+    )
