@@ -1,6 +1,6 @@
 [project]
 name = "harfile"
-version = "0.2.0"
+version = "0.3.0"
 description = "Writer for HTTP Archive (HAR) files"
 keywords = ["har", "http", "testing"]
 classifiers = [
