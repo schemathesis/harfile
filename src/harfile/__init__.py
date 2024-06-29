@@ -4,15 +4,15 @@ from __future__ import annotations
 
 import builtins
 import json
-from dataclasses import asdict
 from datetime import datetime
 from os import PathLike
 from types import TracebackType
-from typing import IO, Any
+from typing import IO
 
 from ._models import (
     Browser,
     Cache,
+    CacheEntry,
     Content,
     Cookie,
     Creator,
@@ -31,6 +31,7 @@ __all__ = [
     "Browser",
     "Creator",
     "Cache",
+    "CacheEntry",
     "Request",
     "Response",
     "Timings",
@@ -124,48 +125,25 @@ class HarFile:
         if not self._has_preable:
             self._write_preamble()
             self._has_preable = True
-        self._write_entry(
-            startedDateTime=startedDateTime,
-            time=time,
-            request=request,
-            response=response,
-            cache=cache,
-            timings=timings,
-            serverIPAddress=serverIPAddress,
-            connection=connection,
-            comment=comment,
-        )
-
-    def _write_entry(
-        self,
-        *,
-        startedDateTime: datetime,
-        time: int | float,
-        request: Request,
-        response: Response,
-        timings: Timings,
-        cache: Cache | None = None,
-        serverIPAddress: str | None = None,
-        connection: str | None = None,
-        comment: str | None = None,
-    ) -> None:
         separator = "\n" if self._is_first_entry else ",\n"
         self._is_first_entry = False
-        self._fd.write(f"{separator}            {{")
-        self._fd.write(f'\n                "startedDateTime": "{startedDateTime.isoformat()}",')
-        self._fd.write(f'\n                "time": {time},')
-        self._fd.write(f'\n                "request": {json.dumps(asdict(request, dict_factory=_dict_factory))},')
-        self._fd.write(f'\n                "response": {json.dumps(asdict(response, dict_factory=_dict_factory))},')
-        self._fd.write(f'\n                "timings": {json.dumps(asdict(timings, dict_factory=_dict_factory))}')
+        write = self._fd.write
+        dumps = json.dumps
+        write(f"{separator}            {{")
+        write(f'\n                "startedDateTime": "{startedDateTime.isoformat()}",')
+        write(f'\n                "time": {time},')
+        write(f'\n                "request": {dumps(request.asdict())},')
+        write(f'\n                "response": {dumps(response.asdict())},')
+        write(f'\n                "timings": {dumps(timings.asdict())}')
         if cache:
-            self._fd.write(f',\n                "cache": {json.dumps(asdict(cache, dict_factory=_dict_factory))}')
+            write(f',\n                "cache": {dumps(cache.asdict())}')
         if serverIPAddress:
-            self._fd.write(f',\n                "serverIPAddress": {json.dumps(serverIPAddress)}')
+            write(f',\n                "serverIPAddress": {dumps(serverIPAddress)}')
         if connection:
-            self._fd.write(f',\n                "connection": {json.dumps(connection)}')
+            write(f',\n                "connection": {dumps(connection)}')
         if comment:
-            self._fd.write(f',\n                "comment": {json.dumps(comment)}')
-        self._fd.write("\n            }")
+            write(f',\n                "comment": {dumps(comment)}')
+        write("\n            }")
 
     def _write_preamble(self) -> None:
         creator = f"""{{
@@ -186,7 +164,7 @@ class HarFile:
         "creator": {creator},
         "browser": {browser}""")
         if self._comment:
-            self._fd.write(f'    "comment": "{self._comment}"')
+            self._fd.write(f',\n        "comment": "{self._comment}"')
         self._fd.write(',\n        "entries": [')
 
     def _write_postscript(self) -> None:
@@ -194,10 +172,6 @@ class HarFile:
             self._fd.write("]\n    }\n}")
         else:
             self._fd.write("\n        ]\n    }\n}")
-
-
-def _dict_factory(value: list[tuple[str, Any]]) -> dict[str, Any]:
-    return {key: value for key, value in value if value is not None}
 
 
 open = HarFile.open

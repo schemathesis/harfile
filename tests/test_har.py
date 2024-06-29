@@ -447,8 +447,10 @@ def test_with_comments():
         buffer,
         creator=harfile.Creator(name="test", version="0.1", comment="EXAMPLE-1"),
         browser=harfile.Browser(name="test", version="0.2", comment="EXAMPLE-2"),
+        comment="EXAMPLE-3",
     ):
         pass
+    print(buffer.getvalue())
     assert (
         buffer.getvalue()
         == """{
@@ -464,7 +466,9 @@ def test_with_comments():
             "version": "0.2",
             "comment": "EXAMPLE-2"
         },
+        "comment": "EXAMPLE-3",
         "entries": []
     }
 }"""
     )
+    HAR_VALIDATOR.validate(json.loads(buffer.getvalue()))

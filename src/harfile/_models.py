@@ -1,9 +1,17 @@
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass, field
+from typing import Any
+
+kwargs: dict[str, bool]
+if sys.version_info < (3, 10):
+    kwargs = {}
+else:
+    kwargs = {"slots": True}
 
 
-@dataclass
+@dataclass(**kwargs)
 class Creator:
     # Name of the application used to export the log
     name: str
@@ -12,7 +20,7 @@ class Creator:
     comment: str | None = None
 
 
-@dataclass
+@dataclass(**kwargs)
 class Browser:
     # Name of the browser used to export the log
     name: str
@@ -21,7 +29,7 @@ class Browser:
     comment: str | None = None
 
 
-@dataclass
+@dataclass(**kwargs)
 class Cache:
     """Info about a request coming from browser cache."""
 
@@ -31,8 +39,18 @@ class Cache:
     afterRequest: CacheEntry | None = None
     comment: str | None = None
 
+    def asdict(self) -> dict[str, Any]:
+        data: dict[str, Any] = {}
+        if self.beforeRequest is not None:
+            data["beforeRequest"] = self.beforeRequest.asdict()
+        if self.afterRequest is not None:
+            data["afterRequest"] = self.afterRequest.asdict()
+        if self.comment is not None:
+            data["comment"] = self.comment
+        return data
 
-@dataclass
+
+@dataclass(**kwargs)
 class CacheEntry:
     # Expiration time of the cache entry
     expires: str
@@ -43,8 +61,14 @@ class CacheEntry:
     hitCount: int
     comment: str | None = None
 
+    def asdict(self) -> dict[str, Any]:
+        data = {"expires": self.expires, "lastAccess": self.lastAccess, "eTag": self.eTag, "hitCount": self.hitCount}
+        if self.comment is not None:
+            data["comment"] = self.comment
+        return data
 
-@dataclass
+
+@dataclass(**kwargs)
 class Request:
     method: str
     # Absolute URL of the request (fragments are not included)
@@ -62,8 +86,25 @@ class Request:
     bodySize: int = -1
     comment: str | None = None
 
+    def asdict(self) -> dict[str, Any]:
+        data = {
+            "method": self.method,
+            "url": self.url,
+            "httpVersion": self.httpVersion,
+            "cookies": [cookie.asdict() for cookie in self.cookies],
+            "headers": [header.asdict() for header in self.headers],
+            "queryString": [query.asdict() for query in self.queryString],
+            "headersSize": self.headersSize,
+            "bodySize": self.bodySize,
+        }
+        if self.postData is not None:
+            data["postData"] = self.postData.asdict()
+        if self.comment is not None:
+            data["comment"] = self.comment
+        return data
 
-@dataclass
+
+@dataclass(**kwargs)
 class Cookie:
     # The name of the cookie
     name: str
@@ -81,15 +122,37 @@ class Cookie:
     secure: bool | None = None
     comment: str | None = None
 
+    def asdict(self) -> dict[str, Any]:
+        data: dict[str, Any] = {"name": self.name, "value": self.value}
+        if self.path is not None:
+            data["path"] = self.path
+        if self.domain is not None:
+            data["domain"] = self.domain
+        if self.expires is not None:
+            data["expires"] = self.expires
+        if self.httpOnly is not None:
+            data["httpOnly"] = self.httpOnly
+        if self.secure is not None:
+            data["secure"] = self.secure
+        if self.comment is not None:
+            data["comment"] = self.comment
+        return data
 
-@dataclass
+
+@dataclass(**kwargs)
 class Record:
     name: str
     value: str
     comment: str | None = None
 
+    def asdict(self) -> dict[str, str]:
+        data = {"name": self.name, "value": self.value}
+        if self.comment is not None:
+            data["comment"] = self.comment
+        return data
 
-@dataclass
+
+@dataclass(**kwargs)
 class PostData:
     # MIME type of the posted data
     mimeType: str
@@ -99,8 +162,18 @@ class PostData:
     text: str | None = None
     comment: str | None = None
 
+    def asdict(self) -> dict[str, Any]:
+        data: dict[str, Any] = {"mimeType": self.mimeType}
+        if self.params is not None:
+            data["params"] = [param.asdict() for param in self.params]
+        if self.text is not None:
+            data["text"] = self.text
+        if self.comment is not None:
+            data["comment"] = self.comment
+        return data
 
-@dataclass
+
+@dataclass(**kwargs)
 class PostParameter:
     name: str
     value: str | None = None
@@ -108,8 +181,20 @@ class PostParameter:
     contentType: str | None = None
     comment: str | None = None
 
+    def asdict(self) -> dict[str, str]:
+        data = {"name": self.name}
+        if self.value is not None:
+            data["value"] = self.value
+        if self.fileName is not None:
+            data["fileName"] = self.fileName
+        if self.contentType is not None:
+            data["contentType"] = self.contentType
+        if self.comment is not None:
+            data["comment"] = self.comment
+        return data
 
-@dataclass
+
+@dataclass(**kwargs)
 class Content:
     size: int = 0
     # Number of bytes saved
@@ -125,8 +210,22 @@ class Content:
     # Encoding used for response text field e.g "base64"
     comment: str | None = None
 
+    def asdict(self) -> dict[str, Any]:
+        data: dict[str, Any] = {"size": self.size}
+        if self.compression is not None:
+            data["compression"] = self.compression
+        if self.mimeType is not None:
+            data["mimeType"] = self.mimeType
+        if self.text is not None:
+            data["text"] = self.text
+        if self.encoding is not None:
+            data["encoding"] = self.encoding
+        if self.comment is not None:
+            data["comment"] = self.comment
+        return data
 
-@dataclass
+
+@dataclass(**kwargs)
 class Response:
     # Response status
     status: int
@@ -147,8 +246,24 @@ class Response:
     bodySize: int = -1
     comment: str | None = None
 
+    def asdict(self) -> dict[str, Any]:
+        data = {
+            "status": self.status,
+            "statusText": self.statusText,
+            "httpVersion": self.httpVersion,
+            "cookies": [cookie.asdict() for cookie in self.cookies],
+            "headers": [header.asdict() for header in self.headers],
+            "content": self.content.asdict(),
+            "redirectURL": self.redirectURL,
+            "headersSize": self.headersSize,
+            "bodySize": self.bodySize,
+        }
+        if self.comment is not None:
+            data["comment"] = self.comment
+        return data
 
-@dataclass
+
+@dataclass(**kwargs)
 class Timings:
     # Time required to send HTTP request to the server
     send: int | float
@@ -165,3 +280,17 @@ class Timings:
     # Time required for SSL/TLS negotiation
     ssl: int | float = -1
     comment: str | None = None
+
+    def asdict(self) -> dict[str, Any]:
+        data: dict[str, Any] = {
+            "send": self.send,
+            "wait": self.wait,
+            "receive": self.receive,
+            "blocked": self.blocked,
+            "dns": self.dns,
+            "connect": self.connect,
+            "ssl": self.ssl,
+        }
+        if self.comment is not None:
+            data["comment"] = self.comment
+        return data
