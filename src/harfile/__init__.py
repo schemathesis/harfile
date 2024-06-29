@@ -10,7 +10,19 @@ from os import PathLike
 from types import TracebackType
 from typing import IO, Any
 
-from ._models import Browser, Cache, Creator, Request, Response, Timings
+from ._models import (
+    Browser,
+    Cache,
+    Content,
+    Cookie,
+    Creator,
+    PostData,
+    PostParameter,
+    Record,
+    Request,
+    Response,
+    Timings,
+)
 from ._version import VERSION
 
 __all__ = [
@@ -22,6 +34,11 @@ __all__ = [
     "Request",
     "Response",
     "Timings",
+    "Cookie",
+    "Record",
+    "PostData",
+    "PostParameter",
+    "Content",
     "HAR_VERSION",
 ]
 
@@ -135,27 +152,15 @@ class HarFile:
         separator = "" if self._is_first_entry else ",\n"
         self._is_first_entry = False
         self._fd.write(f"{separator}            {{")
-        self._fd.write(
-            f'\n                "startedDateTime": "{startedDateTime.isoformat()}",'
-        )
+        self._fd.write(f'\n                "startedDateTime": "{startedDateTime.isoformat()}",')
         self._fd.write(f'\n                "time": {time},')
-        self._fd.write(
-            f'\n                "request": {json.dumps(asdict(request, dict_factory=_dict_factory))},'
-        )
-        self._fd.write(
-            f'\n                "response": {json.dumps(asdict(response, dict_factory=_dict_factory))},'
-        )
-        self._fd.write(
-            f'\n                "timings": {json.dumps(asdict(timings, dict_factory=_dict_factory))}'
-        )
+        self._fd.write(f'\n                "request": {json.dumps(asdict(request, dict_factory=_dict_factory))},')
+        self._fd.write(f'\n                "response": {json.dumps(asdict(response, dict_factory=_dict_factory))},')
+        self._fd.write(f'\n                "timings": {json.dumps(asdict(timings, dict_factory=_dict_factory))}')
         if cache:
-            self._fd.write(
-                f',\n                "cache": {json.dumps(asdict(cache, dict_factory=_dict_factory))}'
-            )
+            self._fd.write(f',\n                "cache": {json.dumps(asdict(cache, dict_factory=_dict_factory))}')
         if serverIPAddress:
-            self._fd.write(
-                f',\n                "serverIPAddress": {json.dumps(serverIPAddress)}'
-            )
+            self._fd.write(f',\n                "serverIPAddress": {json.dumps(serverIPAddress)}')
         if connection:
             self._fd.write(f',\n                "connection": {json.dumps(connection)}')
         if comment:
