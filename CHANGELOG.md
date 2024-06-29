@@ -2,6 +2,14 @@
 
 ## [Unreleased] - TBD
 
+### Added
+
+- Support string values for `startedDateTime`.
+
+### Changed
+
+- Default to an empty string instead of `None` for `Content.mimeType`
+
 ## [0.2.0] - 2024-06-29
 
 ### Performance
