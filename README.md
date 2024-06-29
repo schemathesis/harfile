@@ -1,10 +1,10 @@
-# python-har
+# harfile
 
-[![CI](https://github.com/schemathesis/python-har/actions/workflows/ci.yml/badge.svg)](https://github.com/schemathesis/python-har/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/Stranger6667/hypothesis-openapi/branch/main/graph/badge.svg)](https://codecov.io/gh/schemathesis/python-har/branch/main)
-[![Version](https://img.shields.io/pypi/v/python-har.svg)](https://pypi.org/project/python-har/)
-[![Python versions](https://img.shields.io/pypi/pyversions/python-har.svg)](https://pypi.org/project/python-har/)
-[![License](https://img.shields.io/pypi/l/python-har.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/schemathesis/harfile/actions/workflows/ci.yml/badge.svg)](https://github.com/schemathesis/harfile/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/Stranger6667/hypothesis-openapi/branch/main/graph/badge.svg)](https://codecov.io/gh/schemathesis/harfile/branch/main)
+[![Version](https://img.shields.io/pypi/v/harfile.svg)](https://pypi.org/project/harfile/)
+[![Python versions](https://img.shields.io/pypi/pyversions/harfile.svg)](https://pypi.org/project/harfile/)
+[![License](https://img.shields.io/pypi/l/harfile.svg)](https://opensource.org/licenses/MIT)
 
 This package provides zero dependency writer for building HAR (HTTP Archive) files in Python.
 
@@ -50,4 +50,4 @@ with harfile.open(buffer) as har:
 ## License
 
 The code in this project is licensed under [MIT license](https://opensource.org/licenses/MIT).
-By contributing to `python-har`, you agree that your contributions will be licensed under its MIT license.
+By contributing to `harfile`, you agree that your contributions will be licensed under its MIT license.
