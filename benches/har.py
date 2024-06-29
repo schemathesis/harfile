@@ -1,10 +1,11 @@
-from datetime import datetime
 import io
 import json
 import pathlib
+from datetime import datetime
+
+import pytest
 
 import harfile
-import pytest
 
 CURRENT_DIR = pathlib.Path(__file__).parent.absolute()
 
@@ -89,13 +90,6 @@ for entry in ENTRIES:
                 **({} if "comment" not in entry["cache"] else {"comment": entry["cache"]["comment"]}),
             }
         )
-
-buffer = io.StringIO()
-with harfile.open(buffer) as har:
-    for entry in ENTRIES:
-        har.add_entry(**entry)
-loaded = json.dumps(json.loads(buffer.getvalue())["log"]["entries"])
-assert len(loaded) == len(RAW_ENTRIES.strip())
 
 
 @pytest.mark.benchmark

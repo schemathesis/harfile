@@ -111,7 +111,7 @@ class HarFile:
     def add_entry(
         self,
         *,
-        startedDateTime: datetime,
+        startedDateTime: datetime | str,
         time: int | float,
         request: Request,
         response: Response,
@@ -129,14 +129,16 @@ class HarFile:
         self._is_first_entry = False
         write = self._fd.write
         dumps = json.dumps
+        if isinstance(startedDateTime, datetime):
+            startedDateTime = startedDateTime.isoformat()
         write(f"{separator}            {{")
-        write(f'\n                "startedDateTime": "{startedDateTime.isoformat()}",')
+        write(f'\n                "startedDateTime": "{startedDateTime}",')
         write(f'\n                "time": {time},')
         write(f'\n                "request": {dumps(request.asdict())},')
         write(f'\n                "response": {dumps(response.asdict())},')
-        write(f'\n                "timings": {dumps(timings.asdict())}')
-        if cache:
-            write(f',\n                "cache": {dumps(cache.asdict())}')
+        write(f'\n                "timings": {dumps(timings.asdict())},')
+        cache = cache or Cache()
+        write(f'\n                "cache": {dumps(cache.asdict())}')
         if serverIPAddress:
             write(f',\n                "serverIPAddress": {dumps(serverIPAddress)}')
         if connection:
