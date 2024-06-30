@@ -6,12 +6,12 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/harfile.svg)](https://pypi.org/project/harfile/)
 [![License](https://img.shields.io/pypi/l/harfile.svg)](https://opensource.org/licenses/MIT)
 
-This package provides zero dependency writer for building HAR (HTTP Archive) files in Python.
+This package provides a zero-dependency writer for building HAR (HTTP Archive) files in Python.
 
-**NOTES**: 
+**NOTES**:
 
-- The writer assumes single-threaded
-- Pages are not supported
+- The writer assumes a single-threaded environment.
+- Pages are not supported.
 
 ## Usage
 
