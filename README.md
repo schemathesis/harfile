@@ -34,8 +34,13 @@ with harfile.open("filename.har") as har:
         ),
         response=harfile.Response(
             status=200,
-            status_text="OK",
+            statusText="OK",
             httpVersion="HTTP/1.1",
+        ),
+        timings=harfile.Timings(
+            send=0,
+            wait=0,
+            receive=0,
         ),
     )
 
