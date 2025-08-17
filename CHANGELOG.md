@@ -2,6 +2,10 @@
 
 ## [Unreleased] - TBD
 
+### Added
+
+- `HarFile.flush` method.
+
 ## [0.3.0] - 2024-06-29
 
 ### Added
