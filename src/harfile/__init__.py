@@ -95,6 +95,9 @@ class HarFile:
             self._has_preable = True
         self._write_postscript()
 
+    def flush(self) -> None:
+        self._fd.flush()
+
     def __enter__(self) -> HarFile:
         return self
 
