@@ -2,6 +2,8 @@
 
 ## [Unreleased] - TBD
 
+## [0.4.0] - 2025-09-24
+
 ### Added
 
 - Test jobs for Python 3.13.
@@ -36,6 +38,8 @@
 
 - Initial public release
 
-[Unreleased]: https://github.com/schemathesis/harfile/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/schemathesis/harfile/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/schemathesis/harfile/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/schemathesis/harfile/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/schemathesis/harfile/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/schemathesis/harfile/compare/v0.1.0...v0.2.0
