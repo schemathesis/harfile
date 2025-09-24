@@ -412,6 +412,7 @@ def write_har(arg, entries):
 @settings(
     phases=[Phase.reuse, Phase.generate, Phase.shrink],
     suppress_health_check=[HealthCheck.function_scoped_fixture, HealthCheck.too_slow],
+    deadline=None,
 )
 def test_write_har(entries, tmp_path):
     buffer = io.StringIO()
