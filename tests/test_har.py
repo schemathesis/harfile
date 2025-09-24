@@ -432,13 +432,15 @@ def test_close():
     buffer = io.StringIO()
     with harfile.open(buffer) as har:
         har.close()
+    assert har.closed
 
 
 def test_exception():
     buffer = io.StringIO()
     with pytest.raises(ZeroDivisionError):
-        with harfile.open(buffer):
+        with harfile.open(buffer) as har:
             raise ZeroDivisionError
+    assert har.closed
     assert buffer.getvalue() == ""
 
 
@@ -451,7 +453,6 @@ def test_with_comments():
         comment="EXAMPLE-3",
     ):
         pass
-    print(buffer.getvalue())
     assert (
         buffer.getvalue()
         == """{
