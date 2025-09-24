@@ -53,6 +53,7 @@ class HarFile:
     _comment: str | None
     _is_first_entry: bool = True
     _has_preable: bool = False
+    _is_managed_fd: bool = False
     closed: bool = False
 
     def __init__(
@@ -81,9 +82,13 @@ class HarFile:
         fd: IO[str]
         if isinstance(name_or_fd, (str, PathLike)):
             fd = builtins.open(name_or_fd, "w")
+            is_managed = True
         else:
             fd = name_or_fd
-        return cls(fd=fd, creator=creator, browser=browser, comment=comment)
+            is_managed = False
+        instance = cls(fd=fd, creator=creator, browser=browser, comment=comment)
+        instance._is_managed_fd = is_managed
+        return instance
 
     def close(self) -> None:
         """Close the HAR file."""
@@ -94,6 +99,8 @@ class HarFile:
             self._write_preamble()
             self._has_preable = True
         self._write_postscript()
+        if self._is_managed_fd:
+            self._fd.close()
 
     def flush(self) -> None:
         self._fd.flush()
@@ -109,6 +116,9 @@ class HarFile:
     ) -> None:
         if type is None:
             self.close()
+        elif self._is_managed_fd:
+            self._fd.close()
+        self.closed = True
         return None
 
     def add_entry(

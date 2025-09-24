@@ -2,6 +2,12 @@
 
 ## [Unreleased] - TBD
 
+### Fixed
+
+- Properly close file descriptors opened by `harfile`.
+
+## [0.3.1] - 2025-08-17
+
 ### Added
 
 - `HarFile.flush` method.
