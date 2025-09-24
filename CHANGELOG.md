@@ -2,6 +2,10 @@
 
 ## [Unreleased] - TBD
 
+### Added
+
+- Test jobs for Python 3.13.
+
 ### Fixed
 
 - Properly close file descriptors opened by `harfile`.
