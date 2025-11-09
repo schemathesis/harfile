@@ -45,6 +45,8 @@ __all__ = [
 
 HAR_VERSION = "1.2"
 
+_JSON_ENCODER = json.JSONEncoder()
+
 
 class HarFile:
     _fd: IO[str]
@@ -141,23 +143,37 @@ class HarFile:
         separator = "\n" if self._is_first_entry else ",\n"
         self._is_first_entry = False
         write = self._fd.write
-        dumps = json.dumps
+        iterencode = _JSON_ENCODER.iterencode
         if isinstance(startedDateTime, datetime):
             startedDateTime = startedDateTime.isoformat()
         write(f"{separator}            {{")
         write(f'\n                "startedDateTime": "{startedDateTime}",')
         write(f'\n                "time": {time},')
-        write(f'\n                "request": {dumps(request.asdict())},')
-        write(f'\n                "response": {dumps(response.asdict())},')
-        write(f'\n                "timings": {dumps(timings.asdict())},')
+        write('\n                "request": ')
+        for chunk in iterencode(request.asdict()):
+            write(chunk)
+        write(',\n                "response": ')
+        for chunk in iterencode(response.asdict()):
+            write(chunk)
+        write(',\n                "timings": ')
+        for chunk in iterencode(timings.asdict()):
+            write(chunk)
         cache = cache or Cache()
-        write(f'\n                "cache": {dumps(cache.asdict())}')
+        write(',\n                "cache": ')
+        for chunk in iterencode(cache.asdict()):
+            write(chunk)
         if serverIPAddress:
-            write(f',\n                "serverIPAddress": {dumps(serverIPAddress)}')
+            write(',\n                "serverIPAddress": ')
+            for chunk in iterencode(serverIPAddress):
+                write(chunk)
         if connection:
-            write(f',\n                "connection": {dumps(connection)}')
+            write(',\n                "connection": ')
+            for chunk in iterencode(connection):
+                write(chunk)
         if comment:
-            write(f',\n                "comment": {dumps(comment)}')
+            write(',\n                "comment": ')
+            for chunk in iterencode(comment):
+                write(chunk)
         write("\n            }")
 
     def _write_preamble(self) -> None:
