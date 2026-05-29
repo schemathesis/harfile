@@ -45,6 +45,10 @@ __all__ = [
 
 HAR_VERSION = "1.2"
 
+# A single reusable encoder avoids the per-call argument handling in ``json.dumps``.
+# With default options this produces output identical to ``json.dumps(obj)``.
+_encode = json.JSONEncoder().encode
+
 
 class HarFile:
     _fd: IO[str]
@@ -140,25 +144,27 @@ class HarFile:
             self._has_preable = True
         separator = "\n" if self._is_first_entry else ",\n"
         self._is_first_entry = False
-        write = self._fd.write
-        dumps = json.dumps
+        dumps = _encode
         if isinstance(startedDateTime, datetime):
             startedDateTime = startedDateTime.isoformat()
-        write(f"{separator}            {{")
-        write(f'\n                "startedDateTime": "{startedDateTime}",')
-        write(f'\n                "time": {time},')
-        write(f'\n                "request": {dumps(request.asdict())},')
-        write(f'\n                "response": {dumps(response.asdict())},')
-        write(f'\n                "timings": {dumps(timings.asdict())},')
         cache = cache or Cache()
-        write(f'\n                "cache": {dumps(cache.asdict())}')
+        chunk = (
+            f"{separator}            {{"
+            f'\n                "startedDateTime": "{startedDateTime}",'
+            f'\n                "time": {time},'
+            f'\n                "request": {dumps(request.asdict())},'
+            f'\n                "response": {dumps(response.asdict())},'
+            f'\n                "timings": {dumps(timings.asdict())},'
+            f'\n                "cache": {dumps(cache.asdict())}'
+        )
         if serverIPAddress:
-            write(f',\n                "serverIPAddress": {dumps(serverIPAddress)}')
+            chunk += f',\n                "serverIPAddress": {dumps(serverIPAddress)}'
         if connection:
-            write(f',\n                "connection": {dumps(connection)}')
+            chunk += f',\n                "connection": {dumps(connection)}'
         if comment:
-            write(f',\n                "comment": {dumps(comment)}')
-        write("\n            }")
+            chunk += f',\n                "comment": {dumps(comment)}'
+        chunk += "\n            }"
+        self._fd.write(chunk)
 
     def _write_preamble(self) -> None:
         creator = f"""{{
