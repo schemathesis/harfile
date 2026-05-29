@@ -26,8 +26,8 @@ jobs:
         with:
           python-version: "3.13"
 
-      - run: pip install pre-commit
-      - run: SKIP=mypy pre-commit run --all-files
+      - uses: astral-sh/setup-uv@v7
+      - run: SKIP=mypy uvx prek run --all-files
 
   mypy:
     name: Mypy
@@ -41,8 +41,8 @@ jobs:
         with:
           python-version: "3.13"
 
-      - run: pip install pre-commit
-      - run: pre-commit run mypy --all-files
+      - uses: astral-sh/setup-uv@v7
+      - run: uvx prek run mypy --all-files
 
   tests:
     strategy:
