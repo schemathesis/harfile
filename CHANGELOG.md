@@ -2,6 +2,10 @@
 
 ## [Unreleased] - TBD
 
+### Added
+
+- Test jobs for Python 3.14.
+
 ### Performance
 
 - Faster HAR writing.
