@@ -147,7 +147,9 @@ class HarFile:
         dumps = _encode
         if isinstance(startedDateTime, datetime):
             startedDateTime = startedDateTime.isoformat()
-        cache = cache or Cache()
+        # The common case is no cache info; avoid allocating a Cache and
+        # encoding an empty dict (``dumps(Cache().asdict())`` is just ``"{}"``).
+        cache_json = "{}" if cache is None else dumps(cache.asdict())
         chunk = (
             f"{separator}            {{"
             f'\n                "startedDateTime": "{startedDateTime}",'
@@ -155,7 +157,7 @@ class HarFile:
             f'\n                "request": {dumps(request.asdict())},'
             f'\n                "response": {dumps(response.asdict())},'
             f'\n                "timings": {dumps(timings.asdict())},'
-            f'\n                "cache": {dumps(cache.asdict())}'
+            f'\n                "cache": {cache_json}'
         )
         if serverIPAddress:
             chunk += f',\n                "serverIPAddress": {dumps(serverIPAddress)}'

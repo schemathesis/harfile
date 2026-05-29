@@ -2,6 +2,10 @@
 
 ## [Unreleased] - TBD
 
+### Performance
+
+- Faster HAR writing.
+
 ## [0.4.0] - 2025-09-24
 
 ### Added
