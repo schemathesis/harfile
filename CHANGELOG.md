@@ -4,6 +4,7 @@
 
 ### Added
 
+- Support for Python 3.15.
 - Ship `py.typed` so type checkers use `harfile` annotations.
 
 ### Fixed
