@@ -145,14 +145,17 @@ class HarFile:
         separator = "\n" if self._is_first_entry else ",\n"
         self._is_first_entry = False
         dumps = _encode
+        # ISO 8601 output never needs escaping, so only user-supplied strings go through the encoder.
         if isinstance(startedDateTime, datetime):
-            startedDateTime = startedDateTime.isoformat()
+            started_date_time = f'"{startedDateTime.isoformat()}"'
+        else:
+            started_date_time = dumps(startedDateTime)
         # The common case is no cache info; avoid allocating a Cache and
         # encoding an empty dict (``dumps(Cache().asdict())`` is just ``"{}"``).
         cache_json = "{}" if cache is None else dumps(cache.asdict())
         chunk = (
             f"{separator}            {{"
-            f'\n                "startedDateTime": "{startedDateTime}",'
+            f'\n                "startedDateTime": {started_date_time},'
             f'\n                "time": {time},'
             f'\n                "request": {dumps(request.asdict())},'
             f'\n                "response": {dumps(response.asdict())},'
@@ -170,16 +173,16 @@ class HarFile:
 
     def _write_preamble(self) -> None:
         creator = f"""{{
-            "name": "{self._creator.name}",
-            "version": "{self._creator.version}\""""
+            "name": {_encode(self._creator.name)},
+            "version": {_encode(self._creator.version)}"""
         if self._creator.comment:
-            creator += f',\n            "comment": "{self._creator.comment}"'
+            creator += f',\n            "comment": {_encode(self._creator.comment)}'
         creator += "\n        }"
         browser = f"""{{
-            "name": "{self._browser.name}",
-            "version": "{self._browser.version}\""""
+            "name": {_encode(self._browser.name)},
+            "version": {_encode(self._browser.version)}"""
         if self._browser.comment:
-            browser += f',\n            "comment": "{self._browser.comment}"'
+            browser += f',\n            "comment": {_encode(self._browser.comment)}'
         browser += "\n        }"
         self._fd.write(f"""{{
     "log": {{
@@ -187,7 +190,7 @@ class HarFile:
         "creator": {creator},
         "browser": {browser}""")
         if self._comment:
-            self._fd.write(f',\n        "comment": "{self._comment}"')
+            self._fd.write(f',\n        "comment": {_encode(self._comment)}')
         self._fd.write(',\n        "entries": [')
 
     def _write_postscript(self) -> None:

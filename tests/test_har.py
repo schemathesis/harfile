@@ -474,3 +474,56 @@ def test_with_comments():
 }"""
     )
     HAR_VALIDATOR.validate(json.loads(buffer.getvalue()))
+
+
+VALUE_NEEDING_ESCAPING = 'say "hi"\\\n'
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "path"),
+    [
+        ({"comment": VALUE_NEEDING_ESCAPING}, ("comment",)),
+        ({"creator": harfile.Creator(name=VALUE_NEEDING_ESCAPING, version="1")}, ("creator", "name")),
+        ({"creator": harfile.Creator(name="test", version=VALUE_NEEDING_ESCAPING)}, ("creator", "version")),
+        (
+            {"creator": harfile.Creator(name="test", version="1", comment=VALUE_NEEDING_ESCAPING)},
+            ("creator", "comment"),
+        ),
+        ({"browser": harfile.Browser(name=VALUE_NEEDING_ESCAPING, version="1")}, ("browser", "name")),
+        ({"browser": harfile.Browser(name="test", version=VALUE_NEEDING_ESCAPING)}, ("browser", "version")),
+        (
+            {"browser": harfile.Browser(name="test", version="1", comment=VALUE_NEEDING_ESCAPING)},
+            ("browser", "comment"),
+        ),
+    ],
+    ids=[
+        "comment",
+        "creator-name",
+        "creator-version",
+        "creator-comment",
+        "browser-name",
+        "browser-version",
+        "browser-comment",
+    ],
+)
+def test_header_values_are_escaped(kwargs, path):
+    buffer = io.StringIO()
+    with harfile.open(buffer, **kwargs):
+        pass
+    value = json.loads(buffer.getvalue())["log"]
+    for key in path:
+        value = value[key]
+    assert value == VALUE_NEEDING_ESCAPING
+
+
+def test_started_date_time_string_is_escaped():
+    buffer = io.StringIO()
+    with harfile.open(buffer) as har:
+        har.add_entry(
+            startedDateTime=VALUE_NEEDING_ESCAPING,
+            time=1,
+            request=harfile.Request(method="GET", url="http://127.0.0.1/", httpVersion="HTTP/1.1"),
+            response=harfile.Response(status=200, statusText="OK", httpVersion="HTTP/1.1"),
+            timings=harfile.Timings(send=0, wait=0, receive=0),
+        )
+    assert json.loads(buffer.getvalue())["log"]["entries"][0]["startedDateTime"] == VALUE_NEEDING_ESCAPING
