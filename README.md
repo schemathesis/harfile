@@ -49,7 +49,6 @@ with harfile.open("filename.har") as har:
 buffer = io.StringIO()
 with harfile.open(buffer) as har:
     pass
-
 ```
 
 ## License
