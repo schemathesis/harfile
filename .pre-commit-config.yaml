@@ -24,7 +24,7 @@ repos:
     hooks:
       - id: mypy
         exclude: ^(tests|benches)/.*$
-        args: ["--ignore-missing-imports"]
+        args: []
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.3
