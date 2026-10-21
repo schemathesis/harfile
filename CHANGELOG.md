@@ -2,6 +2,10 @@
 
 ## [Unreleased] - TBD
 
+### Added
+
+- Ship `py.typed` so type checkers use `harfile` annotations.
+
 ## [0.5.0] - 2026-05-29
 
 ### Added

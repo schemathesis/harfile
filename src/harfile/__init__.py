@@ -76,7 +76,7 @@ class HarFile:
     @classmethod
     def open(
         cls,
-        name_or_fd: str | PathLike | IO[str],
+        name_or_fd: str | PathLike[str] | IO[str],
         *,
         creator: Creator | None = None,
         browser: Browser | None = None,

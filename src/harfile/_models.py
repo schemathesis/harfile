@@ -87,7 +87,7 @@ class Request:
     comment: str | None = None
 
     def asdict(self) -> dict[str, Any]:
-        data = {
+        data: dict[str, Any] = {
             "method": self.method,
             "url": self.url,
             "httpVersion": self.httpVersion,
