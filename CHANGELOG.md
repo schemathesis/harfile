@@ -6,6 +6,10 @@
 
 - Ship `py.typed` so type checkers use `harfile` annotations.
 
+### Fixed
+
+- Invalid JSON when header values or a string `startedDateTime` contain characters needing escaping.
+
 ## [0.5.0] - 2026-05-29
 
 ### Added
