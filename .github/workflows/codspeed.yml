@@ -20,7 +20,7 @@ jobs:
         run: pip install ".[bench]"
 
       - name: Run benchmarks
-        uses: CodSpeedHQ/action@v5.5.0
+        uses: CodSpeedHQ/action@v5.6.0
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
           mode: "instrumentation"
