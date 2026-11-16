@@ -11,7 +11,7 @@ CURRENT_DIR = pathlib.Path(__file__).parent.absolute()
 
 with open(CURRENT_DIR / "entries.json") as fd:
     RAW_ENTRIES = fd.read()
-    ENTRIES = json.loads(RAW_ENTRIES)
+    ENTRIES = json.loads(RAW_ENTRIES, parse_constant=lambda _: 0)
 
 for entry in ENTRIES:
     entry["startedDateTime"] = datetime.fromisoformat(entry["startedDateTime"])

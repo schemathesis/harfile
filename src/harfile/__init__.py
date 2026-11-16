@@ -47,11 +47,11 @@ HAR_VERSION = "1.2"
 
 
 def _make_encode() -> Callable[[Any], str]:
-    encoder = json.JSONEncoder()
+    encoder = json.JSONEncoder(allow_nan=False)
     try:
         # Built once; `JSONEncoder.encode` rebuilds it on every call. PyPy has none.
         c_encode = json.encoder.c_make_encoder(  # type: ignore[attr-defined]
-            None, encoder.default, json.encoder.encode_basestring_ascii, None, ": ", ", ", False, False, True
+            None, encoder.default, json.encoder.encode_basestring_ascii, None, ": ", ", ", False, False, False
         )
     except (AttributeError, TypeError):
         return encoder.encode
@@ -156,7 +156,6 @@ class HarFile:
             self._write_preamble()
             self._has_preamble = True
         separator = "\n" if self._is_first_entry else ",\n"
-        self._is_first_entry = False
         dumps = _encode
         # ISO 8601 output never needs escaping, so only user-supplied strings go through the encoder.
         if isinstance(startedDateTime, datetime):
@@ -171,7 +170,7 @@ class HarFile:
         chunk = (
             f"{separator}            {{"
             f'\n                "startedDateTime": {started_date_time},'
-            f'\n                "time": {time},'
+            f'\n                "time": {dumps(time)},'
             f'\n                "request": {dumps(request.asdict())},'
             f'\n                "response": {dumps(response.asdict())},'
             f'\n                "timings": {dumps(timings.asdict())},'
@@ -185,6 +184,7 @@ class HarFile:
             chunk += f',\n                "comment": {dumps(comment)}'
         chunk += "\n            }"
         self._fd.write(chunk)
+        self._is_first_entry = False
 
     def _write_preamble(self) -> None:
         creator = f"""{{

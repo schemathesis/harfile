@@ -373,16 +373,18 @@ if sys.version_info < (3, 10):
         harfile.Timings,
         st.builds(
             harfile.Timings,
-            blocked=st.floats() | st.integers(),
+            blocked=st.floats(allow_nan=False, allow_infinity=False) | st.integers(),
             comment=st.text() | st.none(),
-            connect=st.floats() | st.integers(),
-            dns=st.floats() | st.integers(),
-            receive=st.floats() | st.integers(),
-            send=st.floats() | st.integers(),
-            ssl=st.floats() | st.integers(),
-            wait=st.floats() | st.integers(),
+            connect=st.floats(allow_nan=False, allow_infinity=False) | st.integers(),
+            dns=st.floats(allow_nan=False, allow_infinity=False) | st.integers(),
+            receive=st.floats(allow_nan=False, allow_infinity=False) | st.integers(),
+            send=st.floats(allow_nan=False, allow_infinity=False) | st.integers(),
+            ssl=st.floats(allow_nan=False, allow_infinity=False) | st.integers(),
+            wait=st.floats(allow_nan=False, allow_infinity=False) | st.integers(),
         ),
     )
+
+st.register_type_strategy(float, st.floats(allow_nan=False, allow_infinity=False))
 
 
 ENTRY_STRATEGY = st.fixed_dictionaries(
@@ -595,3 +597,24 @@ def test_encode_matches_json_dumps():
         "nested": [{"a": [1, 2.5, -1e100, True, False, None], "b": {}}, [], ""],
     }
     assert harfile._encode(sample) == json.dumps(sample)
+
+
+def _add_entry(har, *, time=1, send=0):
+    har.add_entry(
+        startedDateTime="2024-01-01T00:00:00+00:00",
+        time=time,
+        request=harfile.Request(method="GET", url="http://127.0.0.1/", httpVersion="HTTP/1.1"),
+        response=harfile.Response(status=200, statusText="OK", httpVersion="HTTP/1.1"),
+        timings=harfile.Timings(send=send, wait=0, receive=0),
+    )
+
+
+@pytest.mark.parametrize("field", ["time", "send"])
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")], ids=["nan", "inf", "-inf"])
+def test_non_finite_floats_are_rejected(field, value):
+    buffer = io.StringIO()
+    with harfile.open(buffer) as har:
+        with pytest.raises(ValueError, match="not JSON compliant"):
+            _add_entry(har, **{field: value})
+        _add_entry(har)
+    assert len(json.loads(buffer.getvalue())["log"]["entries"]) == 1
