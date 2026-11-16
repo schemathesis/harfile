@@ -550,6 +550,21 @@ def test_started_date_time_string_is_escaped():
     assert json.loads(buffer.getvalue())["log"]["entries"][0]["startedDateTime"] == VALUE_NEEDING_ESCAPING
 
 
+def test_naive_started_date_time_gets_utc_offset():
+    naive = datetime.datetime(2026, 11, 16, 16, 28, 51, 75318)
+    buffer = io.StringIO()
+    with harfile.open(buffer) as har:
+        har.add_entry(
+            startedDateTime=naive,
+            time=1,
+            request=harfile.Request(method="GET", url="http://127.0.0.1/", httpVersion="HTTP/1.1"),
+            response=harfile.Response(status=200, statusText="OK", httpVersion="HTTP/1.1"),
+            timings=harfile.Timings(send=0, wait=0, receive=0),
+        )
+    parsed = datetime.datetime.fromisoformat(json.loads(buffer.getvalue())["log"]["entries"][0]["startedDateTime"])
+    assert parsed == naive.astimezone()
+
+
 def test_encode_matches_json_dumps():
     sample = {
         "text": VALUE_NEEDING_ESCAPING,
