@@ -12,6 +12,15 @@ This package provides a zero-dependency writer for building HAR (HTTP Archive) f
 
 - The writer assumes a single-threaded environment.
 - Pages are not supported.
+- `add_entry` writes each entry to the file right away. If the `with` block raises, the file keeps the entries written so far and stays valid.
+- `add_entry` raises `ValueError` on a closed file and on `NaN` or `Infinity` numbers.
+- Naive `datetime` values count as local time.
+
+## Installation
+
+```
+pip install harfile
+```
 
 ## Usage
 
