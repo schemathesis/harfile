@@ -206,16 +206,15 @@ class Content:
     # This field is populated with textual content only.
     # The text field is either HTTP decoded text or a encoded (e.g. "base64") representation of the response body
     text: str | None = None
-    encoding: str | None = None
     # Encoding used for response text field e.g "base64"
+    encoding: str | None = None
     comment: str | None = None
 
     def asdict(self) -> dict[str, Any]:
         data: dict[str, Any] = {"size": self.size}
         if self.compression is not None:
             data["compression"] = self.compression
-        if self.mimeType is not None:
-            data["mimeType"] = self.mimeType
+        data["mimeType"] = self.mimeType
         if self.text is not None:
             data["text"] = self.text
         if self.encoding is not None:

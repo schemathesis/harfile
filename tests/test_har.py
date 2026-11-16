@@ -337,7 +337,7 @@ if sys.version_info < (3, 10):
                 comment=st.text() | st.none(),
                 compression=st.floats(allow_nan=False, allow_infinity=False) | st.integers(),
                 encoding=st.text() | st.none(),
-                mimeType=st.text() | st.none(),
+                mimeType=st.text(),
                 size=st.integers(),
                 text=st.text() | st.none(),
             ),

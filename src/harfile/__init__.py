@@ -67,7 +67,7 @@ class HarFile:
     _browser: Browser
     _comment: str | None
     _is_first_entry: bool = True
-    _has_preable: bool = False
+    _has_preamble: bool = False
     _is_managed_fd: bool = False
     closed: bool = False
 
@@ -110,9 +110,9 @@ class HarFile:
         if self.closed:
             return None
         self.closed = True
-        if not self._has_preable:
+        if not self._has_preamble:
             self._write_preamble()
-            self._has_preable = True
+            self._has_preamble = True
         self._write_postscript()
         if self._is_managed_fd:
             self._fd.close()
@@ -129,7 +129,7 @@ class HarFile:
         value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        if type is None or self._has_preable:
+        if type is None or self._has_preamble:
             self.close()
         elif self._is_managed_fd:
             self._fd.close()
@@ -150,9 +150,9 @@ class HarFile:
         comment: str | None = None,
     ) -> None:
         """Add an HTTP request to the HAR file."""
-        if not self._has_preable:
+        if not self._has_preamble:
             self._write_preamble()
-            self._has_preable = True
+            self._has_preamble = True
         separator = "\n" if self._is_first_entry else ",\n"
         self._is_first_entry = False
         dumps = _encode
