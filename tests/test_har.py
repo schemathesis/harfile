@@ -527,3 +527,13 @@ def test_started_date_time_string_is_escaped():
             timings=harfile.Timings(send=0, wait=0, receive=0),
         )
     assert json.loads(buffer.getvalue())["log"]["entries"][0]["startedDateTime"] == VALUE_NEEDING_ESCAPING
+
+
+def test_encode_matches_json_dumps():
+    sample = {
+        "text": VALUE_NEEDING_ESCAPING,
+        "unicode": "café 日本語 \U0001f600  ",
+        "control": '\x00\x1f\t\r\n\\ "/',
+        "nested": [{"a": [1, 2.5, -1e100, True, False, None], "b": {}}, [], ""],
+    }
+    assert harfile._encode(sample) == json.dumps(sample)
