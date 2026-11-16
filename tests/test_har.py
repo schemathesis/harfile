@@ -444,6 +444,27 @@ def test_exception():
     assert buffer.getvalue() == ""
 
 
+@pytest.mark.parametrize("managed", [False, True])
+def test_exception_after_entry(managed, tmp_path):
+    path = tmp_path / "test.har"
+    target = path if managed else io.StringIO()
+    with pytest.raises(ZeroDivisionError):
+        with harfile.open(target) as har:
+            har.add_entry(
+                startedDateTime="2026-01-01T00:00:00+00:00",
+                time=1,
+                request=harfile.Request(method="GET", url="http://127.0.0.1/", httpVersion="HTTP/1.1"),
+                response=harfile.Response(status=200, statusText="OK", httpVersion="HTTP/1.1"),
+                timings=harfile.Timings(send=0, wait=0, receive=0),
+            )
+            raise ZeroDivisionError
+    assert har.closed
+    output = path.read_text() if managed else target.getvalue()
+    data = json.loads(output)
+    HAR_VALIDATOR.validate(data)
+    assert len(data["log"]["entries"]) == 1
+
+
 def test_with_comments():
     buffer = io.StringIO()
     with harfile.open(

@@ -2,6 +2,10 @@
 
 ## [Unreleased] - TBD
 
+### Fixed
+
+- Invalid JSON when the `with` block raises after `add_entry` (the file keeps the entries written so far).
+
 ### Performance
 
 - Faster HAR writing by reusing the JSON encoder.
