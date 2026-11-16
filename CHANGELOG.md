@@ -2,6 +2,10 @@
 
 ## [Unreleased] - TBD
 
+### Performance
+
+- Faster HAR writing by reusing the JSON encoder.
+
 ## [0.6.0] - 2026-10-22
 
 ### Added

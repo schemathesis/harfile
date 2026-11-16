@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import builtins
-import json
+import json.encoder
 from datetime import datetime
 from os import PathLike
 from types import TracebackType
-from typing import IO
+from typing import IO, Any, Callable
 
 from ._models import (
     Browser,
@@ -45,9 +45,20 @@ __all__ = [
 
 HAR_VERSION = "1.2"
 
-# A single reusable encoder avoids the per-call argument handling in ``json.dumps``.
-# With default options this produces output identical to ``json.dumps(obj)``.
-_encode = json.JSONEncoder().encode
+
+def _make_encode() -> Callable[[Any], str]:
+    encoder = json.JSONEncoder()
+    try:
+        # Built once; `JSONEncoder.encode` rebuilds it on every call. PyPy has none.
+        c_encode = json.encoder.c_make_encoder(  # type: ignore[attr-defined]
+            None, encoder.default, json.encoder.encode_basestring_ascii, None, ": ", ", ", False, False, True
+        )
+    except (AttributeError, TypeError):
+        return encoder.encode
+    return lambda o: "".join(c_encode(o, 0))
+
+
+_encode = _make_encode()
 
 
 class HarFile:
