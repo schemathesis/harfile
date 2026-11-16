@@ -6,6 +6,7 @@
 
 - Invalid JSON when the `with` block raises after `add_entry` (the file keeps the entries written so far).
 - Missing UTC offset in `startedDateTime` for naive `datetime` values (they count as local time).
+- Invalid JSON from `add_entry` on a closed `HarFile` (it raises `ValueError`).
 
 ### Performance
 

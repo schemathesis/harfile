@@ -435,6 +435,28 @@ def test_close():
     assert har.closed
 
 
+@pytest.mark.parametrize("explicit_close", [True, False], ids=["close", "with-block"])
+def test_add_entry_after_close(explicit_close):
+    buffer = io.StringIO()
+    if explicit_close:
+        har = harfile.open(buffer)
+        har.close()
+    else:
+        with harfile.open(buffer) as har:
+            pass
+    expected = buffer.getvalue()
+    with pytest.raises(ValueError, match="closed file"):
+        har.add_entry(
+            startedDateTime="2024-01-01T00:00:00+00:00",
+            time=1,
+            request=harfile.Request(method="GET", url="http://127.0.0.1/", httpVersion="HTTP/1.1"),
+            response=harfile.Response(status=200, statusText="OK", httpVersion="HTTP/1.1"),
+            timings=harfile.Timings(send=0, wait=0, receive=0),
+        )
+    assert buffer.getvalue() == expected
+    HAR_VALIDATOR.validate(json.loads(expected))
+
+
 def test_exception():
     buffer = io.StringIO()
     with pytest.raises(ZeroDivisionError):
