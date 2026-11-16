@@ -150,6 +150,8 @@ class HarFile:
         comment: str | None = None,
     ) -> None:
         """Add an HTTP request to the HAR file."""
+        if self.closed:
+            raise ValueError("I/O operation on closed file.")
         if not self._has_preamble:
             self._write_preamble()
             self._has_preamble = True
