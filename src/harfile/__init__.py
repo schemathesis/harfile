@@ -129,7 +129,7 @@ class HarFile:
         value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        if type is None:
+        if type is None or self._has_preable:
             self.close()
         elif self._is_managed_fd:
             self._fd.close()
