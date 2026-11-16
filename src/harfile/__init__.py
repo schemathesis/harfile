@@ -158,6 +158,8 @@ class HarFile:
         dumps = _encode
         # ISO 8601 output never needs escaping, so only user-supplied strings go through the encoder.
         if isinstance(startedDateTime, datetime):
+            if startedDateTime.tzinfo is None:
+                startedDateTime = startedDateTime.astimezone()
             started_date_time = f'"{startedDateTime.isoformat()}"'
         else:
             started_date_time = dumps(startedDateTime)
