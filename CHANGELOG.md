@@ -2,6 +2,8 @@
 
 ## [Unreleased] - TBD
 
+## [0.7.0] - 2026-11-17
+
 ### Fixed
 
 - Invalid JSON when the `with` block raises after `add_entry` (the file keeps the entries written so far).
@@ -70,7 +72,8 @@
 
 - Initial public release
 
-[Unreleased]: https://github.com/schemathesis/harfile/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/schemathesis/harfile/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/schemathesis/harfile/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/schemathesis/harfile/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/schemathesis/harfile/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/schemathesis/harfile/compare/v0.3.1...v0.4.0
