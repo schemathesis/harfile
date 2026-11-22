@@ -2,6 +2,8 @@
 
 ## [Unreleased] - TBD
 
+## [0.7.1] - 2026-11-22
+
 ### Fixed
 
 - Leaked file descriptor when `HarFile.close` fails to write to a file opened by `harfile.open`.
@@ -76,7 +78,8 @@
 
 - Initial public release
 
-[Unreleased]: https://github.com/schemathesis/harfile/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/schemathesis/harfile/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/schemathesis/harfile/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/schemathesis/harfile/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/schemathesis/harfile/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/schemathesis/harfile/compare/v0.4.0...v0.5.0
