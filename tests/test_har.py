@@ -489,6 +489,25 @@ def test_exception_after_entry(managed, tmp_path):
     assert len(data["log"]["entries"]) == 1
 
 
+@pytest.mark.parametrize("explicit_close", [True, False], ids=["close", "with-block"])
+def test_close_write_error_closes_managed_fd(explicit_close, monkeypatch, tmp_path):
+    har = harfile.open(tmp_path / "test.har")
+    fd = har._fd
+
+    def write(_):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(fd, "write", write)
+    with pytest.raises(OSError, match="disk full"):
+        if explicit_close:
+            har.close()
+        else:
+            with har:
+                pass
+    assert har.closed
+    assert fd.closed
+
+
 def test_with_comments():
     buffer = io.StringIO()
     with harfile.open(

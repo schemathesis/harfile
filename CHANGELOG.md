@@ -2,6 +2,10 @@
 
 ## [Unreleased] - TBD
 
+### Fixed
+
+- Leaked file descriptor when `HarFile.close` fails to write to a file opened by `harfile.open`.
+
 ## [0.7.0] - 2026-11-17
 
 ### Fixed

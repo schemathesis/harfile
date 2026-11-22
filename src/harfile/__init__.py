@@ -110,12 +110,14 @@ class HarFile:
         if self.closed:
             return None
         self.closed = True
-        if not self._has_preamble:
-            self._write_preamble()
-            self._has_preamble = True
-        self._write_postscript()
-        if self._is_managed_fd:
-            self._fd.close()
+        try:
+            if not self._has_preamble:
+                self._write_preamble()
+                self._has_preamble = True
+            self._write_postscript()
+        finally:
+            if self._is_managed_fd:
+                self._fd.close()
 
     def flush(self) -> None:
         self._fd.flush()
